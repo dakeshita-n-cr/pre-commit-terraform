@@ -21,7 +21,7 @@ function main {
   # Run `tflint --init` for check that plugins installed.
   # It should run once on whole repo.
   {
-    TFLINT_INIT=$(tflint --init 2>&1) 2> /dev/null &&
+    TFLINT_INIT=$(aws-vault exec $AWS_PROFILE -- tflint --init 2>&1) 2> /dev/null &&
       common::colorify "green" "Command 'tflint --init' successfully done:" &&
       echo -e "${TFLINT_INIT}\n\n\n"
   } || {
@@ -50,11 +50,11 @@ function per_dir_hook_unique_part {
 
   # Print checked PATH **only** if TFLint have any messages
   # shellcheck disable=SC2091,SC2068 # Suppress error output
-  $(tflint ${args[@]} 2>&1) 2> /dev/null || {
+  $(aws-vault exec $AWS_PROFILE -- tflint ${args[@]} 2>&1) 2> /dev/null || {
     common::colorify "yellow" "TFLint in $dir_path/:"
 
     # shellcheck disable=SC2068 # hook fails when quoting is used ("$arg[@]")
-    tflint ${args[@]}
+    aws-vault exec $AWS_PROFILE -- tflint ${args[@]}
   }
 
   # return exit code to common::per_dir_hook
